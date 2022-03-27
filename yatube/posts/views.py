@@ -69,7 +69,7 @@ def create(request):
         post = form.save(commit=False)
         post.author = request.user
         post.save()
-        return redirect('posts:profile', request.user)    
+        return redirect('posts:profile', request.user)
     context = {
         'form': form,
         'is_edit': is_edit
