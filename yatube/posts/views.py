@@ -50,7 +50,6 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    # Здесь код запроса к модели и создание словаря контекста
     post_obj = Post.objects.select_related('author').get(id=post_id)
     author = post_obj.author
     post_count = Post.objects.filter(author=author).count()
@@ -65,13 +64,12 @@ def post_detail(request, post_id):
 def create(request):
     is_edit = False
     template = 'posts/create_post.html'
-    form = PostForm(request.POST)
+    form = PostForm(request.POST or None)
     if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
         post.save()
-        return redirect('posts:profile', request.user)
-    form = PostForm()
+        return redirect('posts:profile', request.user)    
     context = {
         'form': form,
         'is_edit': is_edit
