@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %} 
-Редактировать пост
+{{ title }}
 {% endblock %}
 {% block content %}
 {% load user_filters %}
@@ -11,32 +11,51 @@
               <div class="card-header">       
                 Редактировать пост             
               </div>
-              <div class="card-body">        
-                <form method="post" action="posts:post_edit">
-                  <input type="hidden" name="csrfmiddlewaretoken" value="">            
-                  <div class="form-group row my-3 p-3">
-                    <label for="id_text">
-                      Текст поста                  
-                      <span class="required text-danger" >*</span>                  
-                    </label>
-                    <textarea name="text" cols="40" rows="10" class="form-control" required id="id_text">
-                    </textarea>                
-                    <small id="id_text-help" class="form-text text-muted">
-                      Текст нового поста
-                    </small>                  
-                  </div>            
-                  <div class="form-group row my-3 p-3">
-                    <label for="id_group">
-                      Group                  
-                    </label>
-                    <select name="group" class="form-control" id="id_group">
-                      <option value="">---------</option>
-                      <option value="1" selected>Группа: Лев Толстой – зеркало русской революции</option>
-                    </select>
-                    <small id="id_group-help" class="form-text text-muted">
-                      Группа, к которой будет относиться пост
-                    </small>
+              <div class="card-body"> 
+                {% if form.errors %}
+                {% for field in form %}
+                  {% for error in field.errors %}            
+                    <div class="alert alert-danger">
+                      {{ error|escape }}
+                    </div>
+                  {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <div class="alert alert-danger">
+                    {{ error|escape }}
                   </div>
+                {% endfor %}
+            {% endif %}       
+                <form method="post"
+                {% if action_url %}
+                  action="{% url 'posts:post_create' %}"
+                {% endif %}
+              >
+              {% csrf_token %}            
+              {% for field in form %}
+              <div class="form-group row my-3"
+                {% if field.field.required %} 
+                  aria-required="true"
+                {% else %}
+                  aria-required="false"
+                {% endif %}
+              >
+                <label for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                    {% if field.field.required %}
+                      <span class="required text-danger">*</span>
+                    {% endif %}
+                </label>
+                <div>
+                {{ field|addclass:'form-control' }}
+                  {% if field.help_text %}
+                    <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
+                      {{ field.help_text|safe }}
+                    </small>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
                   <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
                       Сохранить
